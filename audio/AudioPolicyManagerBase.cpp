@@ -1571,14 +1571,8 @@ AudioPolicyManagerBase::AudioPolicyManagerBase(AudioPolicyClientInterface *clien
         {
             const IOProfile *outProfile = mHwModules[i]->mOutputProfiles[j];
 
-#ifdef QCOM_HARDWARE
-            if ( (outProfile->mSupportedDevices & mAttachedOutputDevices) &&
-                  !(outProfile->mFlags & AUDIO_OUTPUT_FLAG_DIRECT) ){
-#else
             if ((outProfile->mSupportedDevices & mAttachedOutputDevices) &&
                     ((outProfile->mFlags & AUDIO_OUTPUT_FLAG_DIRECT) == 0)) {
-#endif
-
                 AudioOutputDescriptor *outputDesc = new AudioOutputDescriptor(outProfile);
                 outputDesc->mDevice = (audio_devices_t)(mDefaultOutputDevice &
                                                             outProfile->mSupportedDevices);
@@ -3766,12 +3760,6 @@ const struct StringToEnum sFlagNameToEnumTable[] = {
     STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_PRIMARY),
     STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_FAST),
     STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_DEEP_BUFFER),
-#ifdef QCOM_HARDWARE
-    STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_VOIP_RX),
-    STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_LPA),
-    STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_TUNNEL),
-    STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_INCALL_MUSIC),
-#endif
     STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD),
     STRING_TO_ENUM(AUDIO_OUTPUT_FLAG_NON_BLOCKING),
 };
@@ -3798,7 +3786,6 @@ const struct StringToEnum sFormatNameToEnumTable[] = {
     STRING_TO_ENUM(AUDIO_FORMAT_EVRCWB),
     STRING_TO_ENUM(AUDIO_FORMAT_QCELP),
     STRING_TO_ENUM(AUDIO_FORMAT_MP2),
-    STRING_TO_ENUM(AUDIO_FORMAT_EVRCNW),
 #endif
 };
 

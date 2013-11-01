@@ -133,7 +133,6 @@ static const char P2P_CONFIG_FILE[]     = "/data/misc/wifi/p2p_supplicant.conf";
 static const char CONTROL_IFACE_PATH[]  = "/data/misc/wifi/sockets";
 static const char MODULE_FILE[]         = "/proc/modules";
 
-static const char P2P_DISABLE_PARM[]    = "p2p_disabled=1";
 static const char IFNAME[]              = "IFNAME=";
 #define IFNAMELEN			(sizeof(IFNAME) - 1)
 static const char WPA_EVENT_IGNORE[]    = "CTRL-EVENT-IGNORE ";
@@ -148,16 +147,6 @@ static unsigned char dummy_key[21] = { 0x02, 0x11, 0xbe, 0x33, 0x43, 0x35,
 static char supplicant_name[PROPERTY_VALUE_MAX];
 /* Is either SUPP_PROP_NAME or P2P_PROP_NAME */
 static char supplicant_prop_name[PROPERTY_KEY_MAX];
-
-static int is_primary_interface(const char *ifname)
-{
-    //Treat NULL as primary interface to allow control
-    //on STA without an interface
-    if (ifname == NULL || !strncmp(ifname, primary_iface, strlen(primary_iface))) {
-        return 1;
-    }
-    return 0;
-}
 
 #ifdef SAMSUNG_WIFI
 char* get_samsung_wifi_type()
@@ -548,10 +537,6 @@ int ensure_config_file_exists(const char *config_file)
         TEMP_FAILURE_RETRY(write(destfd, buf, nread));
     }
 
-    if (!strcmp(config_file, SUPP_CONFIG_FILE)) {
-        TEMP_FAILURE_RETRY(write(destfd, P2P_DISABLE_PARM, strlen(P2P_DISABLE_PARM)));
-    }
-
     close(destfd);
     close(srcfd);
 
@@ -682,8 +667,7 @@ int phy_lookup()
         ALOGE("unexpected - found %d phys in /sys/class/ieee80211", n);
         for (i = 0; i < n; i++)
             free(namelist[i]);
-        if (n > 0)
-            free(namelist);
+        free(namelist);
         return -1;
     }
 
@@ -825,6 +809,7 @@ cleanup:
     return ret;
 }
 #endif /* USES_TI_MAC80211 */
+
 
 int wifi_start_supplicant(int p2p_supported)
 {
